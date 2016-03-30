@@ -1,0 +1,18 @@
+canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: 800px;
+    height: 550px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    background-color: lightgrey;
+}
+
+#page-title {
+    text-align: center;
+    margin-bottom: 15px;
+}
