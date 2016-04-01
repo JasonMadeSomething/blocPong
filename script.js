@@ -31,7 +31,7 @@ Paddle.prototype.render = function () {
 Paddle.prototype.move = function (keyCode) {
     if (keyCode === 38) {
         this.yPosition -= this.speed;
-        if (this.yPosition <= 0) {
+        if (this.yPosition < 0) {
             this.yPosition = 0;
         }
     } else if (keyCode === 40) {
@@ -78,7 +78,7 @@ function render() {
 
 function step() {
     context.canvas.width = context.canvas.width;
-    render(context);
+    render();
     animate(step);
 }
 
