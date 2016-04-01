@@ -11,50 +11,50 @@ function Ball(xPos, yPos, radius) {
     this.radius = radius;
 }
 
-function Player(){
-    this.paddle = new Paddle(792, 312.5, 8, 75);
+function Player() {
+    this.paddle = new Paddle(782, 237.5, 8, 75);
 }
 
-function Computer(){
-    this.paddle = new Paddle(0, 312.5, 8, 75);
+function Computer() {
+    this.paddle = new Paddle(10, 237.5, 8, 75);
 }
 
-Paddle.prototype.render = function(context){
+Paddle.prototype.render = function (context) {
     context.beginPath();
     context.rect(this.xPosition, this.yPosition, this.width, this.height);
     context.fillStyle = "black";
     context.fill();
-}
+};
 
-Ball.prototype.render = function(context){
+Ball.prototype.render = function (context) {
     context.beginPath();
-    context.arc(this.xPosition, this.yPosition, this.radius, 0, 0, false);
+    context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
     context.strokeStyle = 'black';
     context.stroke();
     context.fillStyle = 'black';
     context.fill();
-}
+};
 
-Player.prototype.render = function(context) {
+Player.prototype.render = function (context) {
     this.paddle.render(context);
-}
+};
 
-Computer.prototype.render = function(context) {
+Computer.prototype.render = function (context) {
     this.paddle.render(context);
-}
+};
 
 var player = new Player();
 var computer = new Computer();
-var ball = new Ball(400, 275, 25);
+var ball = new Ball(400, 275, 10);
 
-function render(context){
+function render(context) {
     player.render(context);
     computer.render(context);
     ball.render(context);
 }
 
-window.onload = function() {
-    var canvas = document.getElementById("pong-table");
+window.onload = function () {
+    var canvas = document.getElementById("pongTable");
     var context = canvas.getContext('2d');
     render(context);
 };
