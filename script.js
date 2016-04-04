@@ -7,9 +7,11 @@ function Paddle(xPos, yPos, width, height, speed, context) {
     this.speed = speed;
 }
 
-function Ball(xPos, yPos, radius, context) {
-    this.xPosition = xPos;
-    this.yPosition = yPos;
+function Ball(initialXPos, initialYPos, radius, context) {
+    this.xPosition = initialXPos;
+    this.yPosition = initialYPos;
+    this.initialX = initialXPos;
+    this.initialY = initialYPos;
     this.radius = radius;
     this.context = context;
 }
@@ -42,10 +44,58 @@ Paddle.prototype.move = function (keyCode) {
     }
 };
 
+Paddle.prototype.hitDetected = function (xPos, yPos) {
+    var top = this.yPosition - (this.height / 2);
+    var bottom = this.yPosition + (this.height / 2);
+    var side1 = this.xPosition + (this.width / 2);
+    var side2 = this.xPosition - (this.width / 2);
+    
+    if (yPos < top || yPos > bottom) {
+        return false;
+    }
+    if (xPos !== side1 && xPos !== side2){
+        return false;
+    }
+    return true;
+};
+
+Ball.prototype.serve = function () {
+    this.xPosition = this.initialX;
+    this.yPosition = this.initialY;
+    this.xSpeed = (Math.random() * 31) - 15;
+    this.ySpeed = (Math.random() * 31) - 15;
+};
+
+Ball.prototype.updatePosition = function () {
+    var updatedX = this.xPosition + this.xSpeed;
+    var updatedY = this.yPosition + this.ySpeed;
+    
+    if(updatedY > this.context.canvas.height - this.radius || updatedY < this.radius) {
+        this.ySpeed = -(this.ySpeed);
+        updatedY += this.ySpeed;
+    }
+    
+    if(player.hitDetected(updatedX - this.radius, updatedY) || computer.hitDetected(updatedX + this.radius, updatedY)) {
+        this.xSpeed = -(this.xSpeed);
+        updatedX += this.xSpeed;
+    }
+    
+    this.xPosition = updatedX;
+    this.yPosition = updatedY;
+};
+
 Ball.prototype.render = function () {
     this.context.beginPath();
     this.context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
     this.context.fill();
+};
+
+Player.prototype.hitDetected = function (xPos, yPos) {
+    this.paddle.hitDetected(xPos, yPos);
+};
+
+Computer.prototype.hitDetected = function (xPos, yPos) {
+    this.paddle.hitDetected(xPos, yPos);
 };
 
 Player.prototype.render = function () {
@@ -78,6 +128,7 @@ function render() {
 
 function step() {
     context.canvas.width = context.canvas.width;
+    ball.updatePosition();
     render();
     animate(step);
 }
@@ -86,5 +137,6 @@ window.onload = function () {
     window.addEventListener('keydown', function (event) {
         player.paddle.move(event.keyCode);
     });
+    ball.serve();
     animate(step);
 };
