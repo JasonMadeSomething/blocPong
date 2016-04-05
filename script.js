@@ -54,30 +54,45 @@ Paddle.prototype.hitDetected = function (xPos, yPos) {
         return false;
     }
     if (xPos !== side1 && xPos !== side2){
-        return false;
+        //return false;
     }
     return true;
 };
 
+function hitTestPoint(x1, y1, w1, h1, x2, y2)
+{
+//x1, y1 = x and y coordinates of object 1
+//w1, h1 = width and height of object 1
+//x2, y2 = x and y coordinates of object 2 (usually midpt)
+if ((x1 <= x2 && x1+w1 >= x2) &&
+(y1 <= y2 && y1+h1 >= y2))
+return true;
+else
+return false;
+}
+
 Ball.prototype.serve = function () {
     this.xPosition = this.initialX;
     this.yPosition = this.initialY;
-    this.xSpeed = (Math.random() * 31) - 15;
-    this.ySpeed = (Math.random() * 31) - 15;
+    //this.xSpeed = (Math.random() * 31) - 15;
+    //this.ySpeed = (Math.random() * 31) - 15;
+    this.xSpeed = 10;
+    this.ySpeed = 0;
 };
 
 Ball.prototype.updatePosition = function () {
     var updatedX = this.xPosition + this.xSpeed;
     var updatedY = this.yPosition + this.ySpeed;
-    
+
     if(updatedY > this.context.canvas.height - this.radius || updatedY < this.radius) {
         this.ySpeed = -(this.ySpeed);
         updatedY += this.ySpeed;
     }
     
-    if(player.hitDetected(updatedX - this.radius, updatedY) || computer.hitDetected(updatedX + this.radius, updatedY)) {
+    if(player.hitDetected(updatedX, updatedY) || computer.hitDetected(updatedX, updatedY)) {
         this.xSpeed = -(this.xSpeed);
         updatedX += this.xSpeed;
+        alert("HIT!");
     }
     
     this.xPosition = updatedX;
@@ -86,7 +101,8 @@ Ball.prototype.updatePosition = function () {
 
 Ball.prototype.render = function () {
     this.context.beginPath();
-    this.context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
+//    this.context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
+    this.context.rect(this.xPosition, this.yPosition, 5, 5);
     this.context.fill();
 };
 
@@ -127,7 +143,7 @@ function render() {
 }
 
 function step() {
-    context.canvas.width = context.canvas.width;
+    context.clearRect(0, 0, canvas.width, canvas.height);
     ball.updatePosition();
     render();
     animate(step);
