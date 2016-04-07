@@ -18,10 +18,14 @@ function Ball(initialXPos, initialYPos, radius, context) {
 
 function Player(context) {
     this.paddle = new Paddle(782, 237.5, 8, 75, 10, context);
+    this.paddle.leadingEdge = this.paddle.xPosition - this.paddle.width;
+    this.paddle.backEdge = this.paddle.xPosition + this.paddle.width;
 }
 
 function Computer(context) {
     this.paddle = new Paddle(10, 237.5, 8, 75, 10, context);
+    this.paddle.leadingEdge = this.paddle.xPosition + this.paddle.width;
+    this.paddle.backEdge = this.paddle.xPosition - this.paddle.width;
 }
 
 Paddle.prototype.render = function () {
@@ -44,19 +48,18 @@ Paddle.prototype.move = function (direction) {
     }
 };
 
-Paddle.prototype.hitDetected = function (xPos, yPos) {
+Player.prototype.move = function (input) {
+    if(input[38]){
+        this.paddle.move("up");
+    }
+    if(input[40]){
+        this.paddle.move("down");
+    }
+};
+
+Paddle.prototype.hitDetected = function (ballX, ballY) {
     var top = this.yPosition - (this.height / 2);
     var bottom = this.yPosition + (this.height / 2);
-    var side1 = this.xPosition + (this.width / 2);
-    var side2 = this.xPosition - (this.width / 2);
-    
-    if (yPos < top || yPos > bottom) {
-        return false;
-    }
-    if (xPos !== side1 && xPos !== side2){
-        return false;
-    }
-    return true;
 };
 
 function hitTestPoint(x1, y1, w1, h1, x2, y2)
@@ -89,7 +92,7 @@ Ball.prototype.updatePosition = function () {
         updatedY += this.ySpeed;
     }
     
-    if(player.hitDetected(updatedX, updatedY) || computer.hitDetected(updatedX, updatedY)) {
+    if(player.hitDetected(updatedX, updatedY)) {
         this.xSpeed = -(this.xSpeed);
         updatedX += this.xSpeed;
         alert("HIT!");
@@ -106,25 +109,16 @@ Ball.prototype.render = function () {
     this.context.fill();
 };
 
-Player.prototype.hitDetected = function (xPos, yPos) {
-    this.paddle.hitDetected(xPos, yPos);
+Player.prototype.hitDetected = function (ballX, ballY) {
+    this.paddle.hitDetected(ballX, ballY);
 };
 
-Computer.prototype.hitDetected = function (xPos, yPos) {
-    this.paddle.hitDetected(xPos, yPos);
+Computer.prototype.hitDetected = function (ballX, ballY) {
+    this.paddle.hitDetected(ballX, ballY);
 };
 
 Player.prototype.render = function () {
     this.paddle.render();
-};
-
-Player.prototype.move = function (input) {
-    if(input[38]){
-        this.paddle.move("up");
-    }
-    if(input[40]){
-        this.paddle.move("down");
-    }
 };
 
 Computer.prototype.render = function () {
