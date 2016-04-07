@@ -30,13 +30,13 @@ Paddle.prototype.render = function () {
     this.context.fill();
 };
 
-Paddle.prototype.move = function (keyCode) {
-    if (keyCode === 38) {
+Paddle.prototype.move = function (direction) {
+    if (direction === "up") {
         this.yPosition -= this.speed;
         if (this.yPosition < 0) {
             this.yPosition = 0;
         }
-    } else if (keyCode === 40) {
+    } else if (direction === "down") {
         this.yPosition += this.speed;
         if (this.yPosition >= (this.context.canvas.height - this.height)) {
             this.yPosition = this.context.canvas.height - this.height;
@@ -54,7 +54,7 @@ Paddle.prototype.hitDetected = function (xPos, yPos) {
         return false;
     }
     if (xPos !== side1 && xPos !== side2){
-        //return false;
+        return false;
     }
     return true;
 };
@@ -74,8 +74,8 @@ return false;
 Ball.prototype.serve = function () {
     this.xPosition = this.initialX;
     this.yPosition = this.initialY;
-    //this.xSpeed = (Math.random() * 31) - 15;
-    //this.ySpeed = (Math.random() * 31) - 15;
+//    this.xSpeed = (Math.random() * 31) - 15;
+//    this.ySpeed = (Math.random() * 31) - 15;
     this.xSpeed = 10;
     this.ySpeed = 0;
 };
@@ -118,6 +118,15 @@ Player.prototype.render = function () {
     this.paddle.render();
 };
 
+Player.prototype.move = function (input) {
+    if(input[38]){
+        this.paddle.move("up");
+    }
+    if(input[40]){
+        this.paddle.move("down");
+    }
+};
+
 Computer.prototype.render = function () {
     this.paddle.render();
 };
@@ -127,7 +136,7 @@ var context = canvas.getContext('2d');
 var player = new Player(context);
 var computer = new Computer(context);
 var ball = new Ball(400, 275, 10, context);
-
+var playerInput = {};
 
 var animate = window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -144,14 +153,23 @@ function render() {
 
 function step() {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    player.move(playerInput);
     ball.updatePosition();
     render();
     animate(step);
 }
 
 window.onload = function () {
+    window.addEventListener('keyup', function (event) {
+        playerInput[event.keyCode] = false;
+    });
     window.addEventListener('keydown', function (event) {
-        player.paddle.move(event.keyCode);
+        if (event.keyCode === 38 && playerInput[40]) {
+            playerInput[40] = false;
+        } else if(event.keyCode === 40 && playerInput[38]){
+            playerInput[38] = false;
+        }
+        playerInput[event.keyCode] = true;
     });
     ball.serve();
     animate(step);
