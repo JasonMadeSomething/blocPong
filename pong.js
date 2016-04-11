@@ -18,14 +18,14 @@ function Ball(initialXPos, initialYPos, radius, context) {
 
 function Player(context) {
     this.paddle = new Paddle(782, 237.5, 8, 75, 10, context);
-    this.paddle.leadingEdge = this.paddle.xPosition - this.paddle.width;
+    this.paddle.leadingEdge = this.paddle.xPosition
     this.paddle.backEdge = this.paddle.xPosition + this.paddle.width;
 }
 
 function Computer(context) {
     this.paddle = new Paddle(10, 237.5, 8, 75, 10, context);
     this.paddle.leadingEdge = this.paddle.xPosition + this.paddle.width;
-    this.paddle.backEdge = this.paddle.xPosition - this.paddle.width;
+    this.paddle.backEdge = this.paddle.xPosition;
 }
 
 Paddle.prototype.render = function () {
@@ -57,30 +57,43 @@ Player.prototype.move = function (input) {
     }
 };
 
-Paddle.prototype.hitDetected = function (ballX, ballY) {
-    var top = this.yPosition - (this.height / 2);
-    var bottom = this.yPosition + (this.height / 2);
+Paddle.prototype.hitDetected = function (ballX, ballY, screenSide) {
+    var top = this.yPosition;
+    var bottom = this.yPosition + this.height;
+    if(ballY >= top && ballY <= bottom){
+        if(screenSide === 'r'){
+            if(ballX >= this.leadingEdge && ballX <= this.backEdge){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if(ballX <= this.leadingEdge && ballX >= this.backEdge){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
 };
-
-function hitTestPoint(x1, y1, w1, h1, x2, y2)
-{
-//x1, y1 = x and y coordinates of object 1
-//w1, h1 = width and height of object 1
-//x2, y2 = x and y coordinates of object 2 (usually midpt)
-if ((x1 <= x2 && x1+w1 >= x2) &&
-(y1 <= y2 && y1+h1 >= y2))
-return true;
-else
-return false;
-}
 
 Ball.prototype.serve = function () {
     this.xPosition = this.initialX;
     this.yPosition = this.initialY;
-//    this.xSpeed = (Math.random() * 31) - 15;
-//    this.ySpeed = (Math.random() * 31) - 15;
-    this.xSpeed = 10;
-    this.ySpeed = 0;
+    this.xSpeed = (Math.random()* 22 ) - 11.5;
+    this.ySpeed = (Math.random()* 22 ) - 11.5;
+    if(this.xSpeed >= 0 && this.xSpeed < 7 ){
+        this.xSpeed = 7;
+    } else if(this.xSpeed < 0 && this.xSpeed > -7){
+        this.xSpeed = -7;
+    }
+    if(this.ySpeed >= 0 && this.ySpeed < 7) {
+        this.ySpeed = 7;
+    } else if(this.ySpeed < 0 && this.xSpeed > -7) {
+        this.ySpeed = -7;
+    }
 };
 
 Ball.prototype.updatePosition = function () {
@@ -92,10 +105,9 @@ Ball.prototype.updatePosition = function () {
         updatedY += this.ySpeed;
     }
     
-    if(player.hitDetected(updatedX, updatedY)) {
+    if(player.hitDetected(updatedX, updatedY) || computer.hitDetected(updatedX, updatedY)) {
         this.xSpeed = -(this.xSpeed);
         updatedX += this.xSpeed;
-        alert("HIT!");
     }
     
     this.xPosition = updatedX;
@@ -104,17 +116,16 @@ Ball.prototype.updatePosition = function () {
 
 Ball.prototype.render = function () {
     this.context.beginPath();
-//    this.context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
-    this.context.rect(this.xPosition, this.yPosition, 5, 5);
+    this.context.arc(this.xPosition, this.yPosition, this.radius, 0, 2 * Math.PI, false);
     this.context.fill();
 };
 
 Player.prototype.hitDetected = function (ballX, ballY) {
-    this.paddle.hitDetected(ballX, ballY);
+    return this.paddle.hitDetected(ballX, ballY, "r");
 };
 
 Computer.prototype.hitDetected = function (ballX, ballY) {
-    this.paddle.hitDetected(ballX, ballY);
+    return this.paddle.hitDetected(ballX, ballY, "l");
 };
 
 Player.prototype.render = function () {
@@ -131,6 +142,7 @@ var player = new Player(context);
 var computer = new Computer(context);
 var ball = new Ball(400, 275, 10, context);
 var playerInput = {};
+context.fillStyle = 'white';
 
 var animate = window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
