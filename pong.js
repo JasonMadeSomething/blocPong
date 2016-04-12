@@ -31,6 +31,7 @@ Paddle.prototype.move = function (direction) {
 Paddle.prototype.hitDetected = function (ballX, ballY, screenSide) {
     var top = this.yPosition;
     var bottom = this.yPosition + this.height;
+    
     if(ballY >= top && ballY <= bottom){
         if(screenSide === 'r'){
             if(ballX >= this.leadingEdge && ballX <= this.backEdge){
@@ -53,7 +54,9 @@ Paddle.prototype.hitDetected = function (ballX, ballY, screenSide) {
 Paddle.prototype.reset = function () {
     this.yPosition = this.initalPosition;
 };
-
+function GameContestant(context){
+    
+}
 function Player(context) {
     this.paddle = new Paddle(782, 237.5, 8, 75, 10, context);
     this.paddle.leadingEdge = this.paddle.xPosition
@@ -187,12 +190,18 @@ Ball.prototype.serve = function () {
     }
 };
 
+function ScoreBoard(xLeft, yTop, width, height, context) {
+    this.xPosition = xLeft;
+    
+}
+
 var canvas = document.getElementById("pongTable");
 var context = canvas.getContext('2d');
 var player = new Player(context);
 var computer = new Computer(context);
 var ball = new Ball(400, 275, 10, context);
 var playerInput = {};
+var isPaused = true;
 context.fillStyle = 'white';
 
 var animate = window.requestAnimationFrame ||
@@ -206,6 +215,7 @@ function serve() {
     ball.serve();
     computer.reset();
     player.reset();
+    isPaused = true;
 }
 
 function render() {
@@ -216,9 +226,14 @@ function render() {
 
 function step() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    player.move(playerInput);
-    computer.move(ball.yPosition);
-    ball.updatePosition();
+    
+    if(!isPaused){
+        player.move(playerInput);
+        computer.move(ball.yPosition);
+        ball.updatePosition();
+    } else {
+        
+    }
     render();
     animate(step);
 }
@@ -234,6 +249,10 @@ window.onload = function () {
             playerInput[38] = false;
         }
         playerInput[event.keyCode] = true;
+        
+        if(event.keyCode === 32){
+            isPaused = !isPaused;
+        }
     });
     serve();
     animate(step);
