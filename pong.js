@@ -186,6 +186,9 @@ Ball.prototype.serve = function () {
     } else if(this.ySpeed < 0 && this.xSpeed > -7) {
         this.ySpeed = -7;
     }
+    if(player.score === 1 || computer.score === 1) {
+        gameOver = true;
+    }
 };
 
 function ScoreBoard(width, height, context) {
@@ -200,23 +203,23 @@ function ScoreBoard(width, height, context) {
 ScoreBoard.prototype.render = function () {
     var compScore = pad(computer.score);
     var playerScore = pad(player.score);
-    
     var score = compScore + " - " + playerScore;
+    
     this.context.beginPath();
     this.context.strokeStyle = "white";
     this.context.rect(this.xPosition, this.yPosition, this.width, this.height);
     this.context.stroke();
     this.context.font = "40px Verdana";
-    
     this.context.fillText(score, this.xCenter - (context.measureText(score).width / 2), this.yPosition + this.height / 2);
-    //this.context.fillText(computer.score, this.xCenter - 20, this.yPosition + (this.height / 2));
 };
+
 function pad(score){
     if(score <= 9){
         return "0" + score;
     }
     return score;
 }
+
 var canvas = document.getElementById("pongTable");
 var context = canvas.getContext('2d');
 var player = new Player(context);
@@ -225,6 +228,8 @@ var ball = new Ball(400, 275, 10, context);
 var scoreBoard = new ScoreBoard(200, 150, context);
 var playerInput = {};
 var isPaused = true;
+var gameOver = false;
+
 context.fillStyle = 'white';
 
 var animate = window.requestAnimationFrame ||
@@ -246,17 +251,32 @@ function render() {
     computer.render();
     ball.render();
     scoreBoard.render();
+    if(player.score > computer.score && gameOver) {
+        gameOverRender("You Won!");
+    } else if (player.score < computer.score && gameOver){
+        gameOverRender("You Lost!");
+    } 
+}
+
+function gameOverRender(endString) {
+    var resetText = "Press Space to Replay";
+    context.fillStyle = "rgba(255, 255, 255, 0.1)";
+    context.rect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "white";
+    context.fillText(endString, centerTextWidth(endString), canvas.height / 2);
+    context.fillText(resetText, centerTextWidth(resetText), (canvas.height / 2) + context.measureText(endString).height / 2);
+}
+
+function centerTextWidth(text){
+    return (canvas.width / 2) - (context.measureText(text).width / 2);
 }
 
 function step() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    
     if (!isPaused) {
         player.move(playerInput);
         computer.move(ball.yPosition);
         ball.updatePosition();
-    } else {
-        
     }
     render();
     animate(step);
@@ -276,6 +296,11 @@ window.onload = function () {
         
         if (event.keyCode === 32) {
             isPaused = !isPaused;
+            if (gameOver) {
+                gameOver = false;
+                player.score = 0;
+                computer.score = 0;
+            };
         }
     });
     serve();
