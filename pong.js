@@ -249,7 +249,9 @@ function serve() {
 function render() {
     player.render();
     computer.render();
-    ball.render();
+    if(!gameOver) {
+        ball.render();
+    }
     scoreBoard.render();
     if(player.score > computer.score && gameOver) {
         gameOverRender("You Won!");
@@ -260,11 +262,8 @@ function render() {
 
 function gameOverRender(endString) {
     var resetText = "Press Space to Replay";
-    context.fillStyle = "rgba(255, 255, 255, 0.1)";
-    context.rect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "white";
     context.fillText(endString, centerTextWidth(endString), canvas.height / 2);
-    context.fillText(resetText, centerTextWidth(resetText), (canvas.height / 2) + context.measureText(endString).height / 2);
+    context.fillText(resetText, centerTextWidth(resetText), (canvas.height / 2) + (canvas.height / 5));
 }
 
 function centerTextWidth(text){
