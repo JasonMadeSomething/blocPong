@@ -186,7 +186,7 @@ Ball.prototype.serve = function () {
     } else if(this.ySpeed < 0 && this.xSpeed > -7) {
         this.ySpeed = -7;
     }
-    if(player.score === 1 || computer.score === 1) {
+    if(player.score === 11 || computer.score === 11) {
         gameOver = true;
     }
 };
